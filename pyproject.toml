@@ -1,0 +1,46 @@
+[project]
+name = "pert-mcp"
+version = "0.0.1"
+description = "An LLM- and MCP-based PERT chart client"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+   "pydantic==2.12.3",
+   "pydantic-settings==2.11.0",
+   "loguru==0.7.3",
+]
+
+
+[dependency-groups]
+dev = [
+   "ruff==0.14.0",
+   "mypy==1.18.2",
+   "pytest==8.4.2",
+   "pytest-cov==7.0.0",
+   "bandit==1.8.6",
+   "coverage==7.11.0",
+]
+
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",    # flake8 E
+    "W",    # flake8 W
+    "F",    # flake8 F
+    "I",    # isort
+]
+
+[tool.ruff.format]
+line-ending = "auto"
+quote-style = "double"
+
+[tool.mypy]
+ignore_missing_imports = true
+plugins = ['pydantic.mypy']
+
+[tool.bandit]
+skips = ["B101"]
+exclude_dirs = ["tests"]
