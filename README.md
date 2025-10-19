@@ -35,3 +35,24 @@ To skip the pre-commit checks, use the `--no-verify` flag when committing:
 ```
 git commit --no-verify
 ```
+
+## Starting a New Project from This Template
+
+To start a new project without carrying over this repository's commit history:
+
+1. Download or clone this template repository.
+2. Remove the existing git history:
+    ```bash
+    rm -rf .git
+    ```
+3. Initialize a new git repository:
+    ```bash
+    git init
+    ```
+4. Make your initial commit:
+    ```bash
+    git add .
+    git commit -m "Initial commit from template"
+    ```
+
+This ensures your new project starts with a clean commit history, independent from the template.
