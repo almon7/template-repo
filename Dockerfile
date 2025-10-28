@@ -1,4 +1,4 @@
-FROM python:3.13-slim-bookworm
+FROM python:3.13-slim-bookworm AS base
 
 # Avoid writing .pyc files to disk
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -60,3 +60,5 @@ WORKDIR /app/src
 
 # Run the application
 # CMD [ "/usr/bin/bash", "/app/src/scripts/entrypoint.sh" ]
+
+FROM base as debug
