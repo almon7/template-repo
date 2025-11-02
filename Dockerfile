@@ -56,4 +56,4 @@ RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
 WORKDIR /app/src
 
 # Run the application
-# CMD [ "/usr/bin/bash", "/app/src/scripts/entrypoint.sh" ]
+CMD [ "/usr/bin/bash", "/app/src/scripts/entrypoint.sh" ]
