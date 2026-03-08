@@ -34,3 +34,13 @@ if [ $? -ne 0 ]; then
 else
     echo -e "${TEXT_GREEN}Mypy passed.${NC}"
 fi
+
+
+echo -e "${HIGHLIGHT}Running bandit...${NC}"
+uv run bandit -r "${APP_DIR}"
+if [ $? -ne 0 ]; then
+    echo -e "${TEXT_RED}Bandit security issues must be resolved before committing.${NC}"
+    exit 1
+else
+    echo -e "${TEXT_GREEN}Bandit passed.${NC}"
+fi
