@@ -1,4 +1,6 @@
-FROM python:3.13-slim-bookworm
+# ─── base stage ──────────────────────────────────────────────────────────────
+# Shared environment: Python, uv, system deps, non-root user, dependency install.
+FROM python:3.13-slim-bookworm AS base
 
 # Ensure that the Python output is sent straight to terminal (e.g., for logging)
 ENV PYTHONUNBUFFERED=1
@@ -27,33 +29,53 @@ USER nonroot
 # Set working directory
 WORKDIR /app
 
-# Install dependencies but not the project itself to leverage Docker layer caching.
-# --locked ensures that uv.lock is up to date with pyproject.toml;
-RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --locked --no-install-project
-
-# Copy pyproject.toml and uv.lock to the container
+# Copy dependency files
 COPY --chown=nonroot:nonroot pyproject.toml uv.lock /app/
 
-# Copy the application source code
-COPY --chown=nonroot:nonroot src/ /app/src/
 
-# Install the project, caching uv files
+# ─── dev stage ────────────────────────────────────────────────────────────────
+# Contains application code, tests, and scripts.
+# Used for local development and running pre-commit hooks.
+FROM base AS dev
+
+# Install all dependencies including the dev group
+RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
+    uv sync --locked --no-install-project
+
+COPY --chown=nonroot:nonroot src/app     /app/app/
+COPY --chown=nonroot:nonroot tests/   /app/tests/
+COPY --chown=nonroot:nonroot scripts/ /app/scripts/
+
+# Install the project
 RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
     uv sync --locked
 
-# OPTIONAL: Activate the uv virtual environment by placing its directory at the front of the PATH
-# This makes it so that you don't have to prefix commands with `uv run ...`
-# ENV PATH="/app/.venv/bin:$PATH"
+# Activate the uv virtual environment
+ENV PATH="/app/.venv/bin:$PATH"
 
-# OPTIONAL: Add /app/src to PYTHONPATH
-# This allows running code from /app/src without the -m flag
-# ENV PYTHONPATH=""
-# ENV PYTHONPATH="/app/src:${PYTHONPATH}"
+WORKDIR /app
 
-WORKDIR /app/src
+ENTRYPOINT ["/app/scripts/dev-entrypoint.sh"]
 
-# Run the application
-# CMD [ "/usr/bin/bash", "/app/src/scripts/entrypoint.sh" ]
+
+# ─── production stage ─────────────────────────────────────────────────────────
+# Lean image with no tests and no dev tooling. Used for deployment.
+FROM base AS production
+
+# Install production dependencies only (no dev group)
+RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
+    uv sync --locked --no-install-project --no-dev
+
+COPY --chown=nonroot:nonroot src/app /app/app/
+COPY --chown=nonroot:nonroot scripts/prod-entrypoint.sh /usr/local/bin/entrypoint.sh
+
+# Install the project (no dev group)
+RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
+    uv sync --locked --no-dev
+
+# Activate the uv virtual environment
+ENV PATH="/app/.venv/bin:$PATH"
+
+WORKDIR /app
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
