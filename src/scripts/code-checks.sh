@@ -27,7 +27,7 @@ fi;
 
 
 echo -e "${HIGHLIGHT}Running mypy...${NC}"
-uv run mypy --check "${APP_DIR}"
+uv run mypy "${APP_DIR}"
 if [ $? -ne 0 ]; then
     echo -e "${TEXT_RED}Mypy errors must be resolved before committing.${NC}"
     exit 1
