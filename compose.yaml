@@ -3,12 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev
       args:
         UID: ${UID}
         GID: ${GID}
     tty: true
     volumes:
-      - ./src:/app/src
+      - ./src/app:/app/app
+      - ./tests:/app/tests
+      - ./scripts:/app/scripts
       - ./pyproject.toml:/app/pyproject.toml
       - ./uv.lock:/app/uv.lock
     environment:
