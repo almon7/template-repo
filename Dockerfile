@@ -1,8 +1,5 @@
 FROM python:3.13-slim-bookworm
 
-# Avoid writing .pyc files to disk
-ENV PYTHONDONTWRITEBYTECODE=1
-
 # Ensure that the Python output is sent straight to terminal (e.g., for logging)
 ENV PYTHONUNBUFFERED=1
 
