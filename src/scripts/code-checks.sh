@@ -1,6 +1,6 @@
 HIGHLIGHT='\033[0;33m'
-TEXT_RED='\e[31m'
-TEXT_GREEN='\e[32m'
+TEXT_RED='\033[0;31m'
+TEXT_GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 # Use argument if provided, otherwise default to Docker path
