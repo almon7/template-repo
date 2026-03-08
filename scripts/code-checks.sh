@@ -5,7 +5,7 @@ TEXT_GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 # Use argument if provided, otherwise default to Docker path
-APP_DIR="${1:-/app/src/app}"
+APP_DIR="${1:-/app/app}"
 
 echo -e "${HIGHLIGHT}Running ruff format check:${NC}"
 uv run ruff format --check "${APP_DIR}"

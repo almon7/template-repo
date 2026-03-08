@@ -28,10 +28,10 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Run code quality checks
-        run: bash src/scripts/code-checks.sh src/app
+        run: bash scripts/code-checks.sh src/app
 
       - name: Run bandit security checks
         run: uv run bandit -r src/app
 
       - name: Run tests with coverage
-        run: bash src/scripts/run-tests.sh src/tests src/app
+        run: bash scripts/run-tests.sh tests src/app

@@ -2,7 +2,7 @@
 # format.sh
 # This script runs code formatting tools on the codebase.
 
-APP_DIR="${1:-/app/src/app}"
+APP_DIR="${1:-/app/app}"
 
 echo "Running ruff format..."
 uv run ruff format "${APP_DIR}"
