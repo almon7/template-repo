@@ -1,3 +1,4 @@
+#!/bin/bash
 # This hook runs code checks inside the Docker container
 
 # To set up this hook, run the following:

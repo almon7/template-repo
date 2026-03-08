@@ -1,3 +1,4 @@
+#!/bin/bash
 HIGHLIGHT='\033[0;33m'
 TEXT_RED='\033[0;31m'
 TEXT_GREEN='\033[0;32m'
