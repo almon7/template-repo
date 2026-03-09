@@ -62,3 +62,22 @@ plugins = ["pydantic.mypy"]
 [tool.bandit]
 skips = ["B101"]
 exclude_dirs = ["tests"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "--cov=app",
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-fail-under=80",
+]
+
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
