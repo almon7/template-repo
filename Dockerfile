@@ -14,11 +14,6 @@ ENV UV_COMPILE_BYTECODE=1
 # Install uv binaries from the official image
 COPY --from=ghcr.io/astral-sh/uv:0.9.2 /uv /uvx /bin/
 
-# Update system dependencies
-RUN apt-get update \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
 # Create a non-root user and switch to it.
 # ARG defaults match sample.env so plain `docker build .` works without --build-arg.
 ARG UID=1000
