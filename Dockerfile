@@ -46,6 +46,9 @@ COPY --chown=nonroot:nonroot src/app     /app/app/
 COPY --chown=nonroot:nonroot tests/   /app/tests/
 COPY --chown=nonroot:nonroot scripts/ /app/scripts/
 
+# Ensure all scripts are executable
+RUN chmod +x /app/scripts/*.sh
+
 # Install the project
 RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
     uv sync --locked
@@ -79,6 +82,9 @@ RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
 
 # Activate the uv virtual environment
 ENV PATH="/app/.venv/bin:$PATH"
+
+# Ensure the entrypoint is executable
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /app
 
