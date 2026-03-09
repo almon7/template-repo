@@ -55,7 +55,9 @@ quote-style = "double"
 
 [tool.mypy]
 ignore_missing_imports = true
-plugins = ['pydantic.mypy']
+strict = true
+plugins = ["pydantic.mypy"]
+
 
 [tool.bandit]
 skips = ["B101"]
