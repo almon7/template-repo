@@ -19,9 +19,10 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user and switch to it
-ARG UID
-ARG GID
+# Create a non-root user and switch to it.
+# ARG defaults match sample.env so plain `docker build .` works without --build-arg.
+ARG UID=1000
+ARG GID=1000
 RUN groupadd -g ${GID} nonroot && \
     useradd -u ${UID} -g nonroot -m nonroot
 USER nonroot
@@ -37,6 +38,10 @@ COPY --chown=nonroot:nonroot pyproject.toml uv.lock /app/
 # Contains application code, tests, and scripts.
 # Used for local development and running pre-commit hooks.
 FROM base AS dev
+
+# ARG must be redeclared in each stage that uses it (Docker ARGs are stage-scoped).
+ARG UID=1000
+ARG GID=1000
 
 # Install all dependencies including the dev group
 RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
@@ -61,6 +66,10 @@ ENTRYPOINT ["/app/scripts/dev-entrypoint.sh"]
 # ─── production stage ─────────────────────────────────────────────────────────
 # Lean image with no tests and no dev tooling. Used for deployment.
 FROM base AS production
+
+# ARG must be redeclared in each stage that uses it (Docker ARGs are stage-scoped).
+ARG UID=1000
+ARG GID=1000
 
 # Install production dependencies only (no dev group)
 RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
