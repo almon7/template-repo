@@ -12,7 +12,7 @@ ENV UV_LINK_MODE=copy
 ENV UV_COMPILE_BYTECODE=1
 
 # Install uv binaries from the official image
-COPY --from=ghcr.io/astral-sh/uv:0.9.2 /uv /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.9.2 /uv /uvx /bin/
 
 # Update system dependencies
 RUN apt-get update \
