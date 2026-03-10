@@ -8,6 +8,12 @@ TEXT_RED='\033[0;31m'
 TEXT_GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+# Resolve the project root (one level up from this script) so tools that
+# accept a config-file path always receive an absolute path, regardless of
+# the working directory at invocation time (e.g. inside Docker).
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "${SCRIPT_DIR}")"
+
 # Use arguments if provided, otherwise default to Docker paths
 APP_DIR="${1:-/app/app}"
 TEST_DIR="${2:-/app/tests}"
@@ -40,8 +46,8 @@ fi
 
 
 echo -e "${HIGHLIGHT}Running bandit on ${APP_DIR}...${NC}"
-# -c pyproject.toml: required to load [tool.bandit] config (skips, exclude_dirs).
-if ! uv run bandit -c pyproject.toml -r "${APP_DIR}"; then
+# -c: absolute path so bandit can find the config regardless of working directory.
+if ! uv run bandit -c "${PROJECT_ROOT}/pyproject.toml" -r "${APP_DIR}"; then
     echo -e "${TEXT_RED}Bandit security issues must be resolved before committing.${NC}"
     exit 1
 else
