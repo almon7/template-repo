@@ -57,9 +57,10 @@ def create_app() -> FastAPI:
     # Security headers on every response
     _app.add_middleware(SecurityHeadersMiddleware)
 
-    # Guard against HTTP Host header attacks
-    if settings.environment == "production":
-        _app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
+    # Guard against HTTP Host header attacks.
+    # allowed_hosts defaults to ["*"] in development; the settings validator
+    # rejects ["*"] in production, ensuring real domain(s) are always set.
+    _app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
 
     _app.include_router(health.router)
 

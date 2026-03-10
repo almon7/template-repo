@@ -48,6 +48,12 @@ def test_verbose_log_level_forbidden_in_production(log_level: str) -> None:
         Settings(environment="production", log_level=log_level)
 
 
+def test_wildcard_allowed_hosts_forbidden_in_production() -> None:
+    """Production must reject the catch-all wildcard for allowed_hosts."""
+    with pytest.raises(ValidationError, match="is not permitted when ENVIRONMENT=production"):
+        Settings(environment="production", allowed_hosts=["*"])
+
+
 @pytest.mark.parametrize(("log_level", "expected_debug"), [("TRACE", True), ("DEBUG", True), ("INFO", False)])
 def test_debug_derived_from_log_level(log_level: str, expected_debug: bool) -> None:
     """debug is True only when log_level is TRACE or DEBUG."""
