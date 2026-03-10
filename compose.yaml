@@ -9,6 +9,7 @@ services:
         GID: ${GID}
     tty: true
     restart: unless-stopped
+    env_file: .env
     volumes:
       - ./src/app:/app/app
       - ./tests:/app/tests
