@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from importlib.metadata import version
 
 from fastapi import FastAPI
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -39,6 +40,7 @@ def create_app() -> FastAPI:
     """Application factory — keeps instantiation testable and explicit."""
     _app = FastAPI(
         title=settings.app_name,
+        version=version("template-app"),
         lifespan=lifespan,
         # When True, FastAPI includes full Python tracebacks in 500 error
         # responses. Useful locally; blocked in production by the settings
