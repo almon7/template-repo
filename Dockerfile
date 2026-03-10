@@ -12,7 +12,7 @@ ENV UV_LINK_MODE=copy
 ENV UV_COMPILE_BYTECODE=1
 
 # Install uv binaries from the official image
-COPY --from=ghcr.io/astral-sh/uv:0.9.2 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.9.3 /uv /uvx /bin/
 
 # Create a non-root user and switch to it.
 # ARG defaults match sample.env so plain `docker build .` works without --build-arg.
@@ -58,6 +58,8 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
 
+EXPOSE 8000
+
 ENTRYPOINT ["/app/scripts/dev-entrypoint.sh"]
 
 
@@ -87,5 +89,12 @@ ENV PATH="/app/.venv/bin:$PATH"
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /app
+
+EXPOSE 8000
+
+# Docker will query the health endpoint every 30 s. The 5 s start-period gives
+# uvicorn time to start before the first probe, avoiding false "unhealthy" status.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')" || exit 1
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
