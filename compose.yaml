@@ -18,6 +18,5 @@ services:
       - ./uv.lock:/app/uv.lock
     environment:
       - SAMPLE_ENV_VAR=${SAMPLE_ENV_VAR}
-    # Uncomment and adjust when your app exposes a port (e.g., FastAPI on 8000):
-    # ports:
-    #   - "8000:8000"
+    ports:
+      - "${APP_PORT:-8000}:8000"
