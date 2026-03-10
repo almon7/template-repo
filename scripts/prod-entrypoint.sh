@@ -3,5 +3,11 @@
 set -euo pipefail
 # prod-entrypoint.sh
 # This script is executed when the production Docker container starts.
+# Single worker is the recommended default when scaling is handled at the container
+# orchestration layer (e.g. Kubernetes, ECS). Increase --workers only if you run many
+# containers on a single host and want to utilise multiple CPU cores per container.
 
-uv run python -m app.main
+uv run uvicorn app.main:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --no-access-log
