@@ -8,11 +8,12 @@ TEXT_RED='\033[0;31m'
 TEXT_GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
-# Use argument if provided, otherwise default to Docker path
+# Use arguments if provided, otherwise default to Docker paths
 APP_DIR="${1:-/app/app}"
+TEST_DIR="${2:-/app/tests}"
 
 echo -e "${HIGHLIGHT}Running ruff format check:${NC}"
-if ! uv run ruff format --check "${APP_DIR}"; then
+if ! uv run ruff format --check "${APP_DIR}" "${TEST_DIR}"; then
     echo -e "${TEXT_RED}Ruff needs to be run before committing.${NC}"
     exit 1
 else
@@ -21,7 +22,7 @@ fi
 
 
 echo -e "${HIGHLIGHT}Running ruff lint check:${NC}"
-if ! uv run ruff check "${APP_DIR}"; then
+if ! uv run ruff check "${APP_DIR}" "${TEST_DIR}"; then
     echo -e "${TEXT_RED}Ruff lint errors must be resolved before committing.${NC}"
     exit 1
 else
@@ -30,7 +31,7 @@ fi
 
 
 echo -e "${HIGHLIGHT}Running mypy...${NC}"
-if ! uv run mypy "${APP_DIR}"; then
+if ! uv run mypy "${APP_DIR}" "${TEST_DIR}"; then
     echo -e "${TEXT_RED}Mypy errors must be resolved before committing.${NC}"
     exit 1
 else

@@ -5,9 +5,10 @@ set -euo pipefail
 # This script runs code formatting tools on the codebase.
 
 APP_DIR="${1:-/app/app}"
+TEST_DIR="${2:-/app/tests}"
 
 echo "Running ruff format..."
-uv run ruff format "${APP_DIR}"
+uv run ruff format "${APP_DIR}" "${TEST_DIR}"
 
 echo "Running ruff lint --fix..."
-uv run ruff check --fix "${APP_DIR}"
+uv run ruff check --fix "${APP_DIR}" "${TEST_DIR}"
