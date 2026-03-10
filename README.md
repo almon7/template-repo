@@ -7,7 +7,7 @@
 
 ## Overview
 A template app for the development of dockerised python-based projects.
-It is set up with docker-compose and includes pre-commit hooks, tests, coverage calculation, pipeline checks, aliases, static checking and formatting.
+It is set up with docker-compose and includes pre-commit hooks, tests, coverage calculation, pipeline checks, a Makefile, static checking and formatting.
 
 ## Running the App:
 
