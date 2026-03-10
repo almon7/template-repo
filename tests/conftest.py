@@ -8,7 +8,7 @@ from loguru import logger
 
 
 @pytest.fixture(autouse=True)
-def silence_logs():
+def silence_logs() -> Generator[None]:
     """Remove all loguru handlers during tests to avoid noisy output."""
     logger.remove()
     yield
