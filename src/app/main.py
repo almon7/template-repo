@@ -2,12 +2,14 @@ from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
 from app.log import configure_logging
+from app.routers import health
 from app.settings import settings
 
 
@@ -50,6 +52,12 @@ def create_app() -> FastAPI:
 
     # Security headers on every response
     _app.add_middleware(SecurityHeadersMiddleware)
+
+    # Guard against HTTP Host header attacks
+    if settings.environment == "production":
+        _app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
+
+    _app.include_router(health.router)
 
     return _app
 
