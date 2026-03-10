@@ -1,14 +1,14 @@
 # ─── base stage ──────────────────────────────────────────────────────────────
-# Shared environment: Python, uv, system deps, non-root user, dependency install.
+# Shared environment: Python, uv, non-root user, dependency install.
 FROM python:3.13-slim-bookworm AS base
 
-# Ensure that the Python output is sent straight to terminal (e.g., for logging)
+# Ensure Python output is sent straight to terminal (e.g., for logging)
 ENV PYTHONUNBUFFERED=1
 
-# Copy uv files from the cache instead of linking so as not to cause issues with bind mounts
+# Place dependency files by copy instead of hard-link to avoid issues with bind mounts
 ENV UV_LINK_MODE=copy
 
-# Compile Python files to bytecode when installing dependencies. Improves startup time at the cost of installation time.
+# Pre-compile Python files to bytecode on install. Improves startup time at the cost of install time.
 ENV UV_COMPILE_BYTECODE=1
 
 # Install uv binaries from the official image
@@ -42,7 +42,7 @@ ARG GID=1000
 RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
     uv sync --locked --no-install-project
 
-COPY --chown=nonroot:nonroot src/app     /app/app/
+COPY --chown=nonroot:nonroot src/app  /app/app/
 COPY --chown=nonroot:nonroot tests/   /app/tests/
 COPY --chown=nonroot:nonroot scripts/ /app/scripts/
 
