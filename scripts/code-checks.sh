@@ -53,3 +53,5 @@ if ! uv run bandit -c "${PROJECT_ROOT}/pyproject.toml" -r "${APP_DIR}"; then
 else
     echo -e "${TEXT_GREEN}Bandit passed.${NC}"
 fi
+
+echo -e "${TEXT_GREEN}All checks passed.${NC}"
