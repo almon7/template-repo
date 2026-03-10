@@ -5,6 +5,7 @@ set -euo pipefail
 # This script is executed when the dev Docker container starts.
 # Runs uvicorn with hot-reload so source changes in the mounted volume take effect immediately.
 
+echo "Starting dev server on 0.0.0.0:8000 with hot-reload..."
 uv run uvicorn app.main:app \
     --host 0.0.0.0 \
     --port 8000 \

@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 APP_DIR="${1:-/app/app}"
 TEST_DIR="${2:-/app/tests}"
 
-echo -e "${HIGHLIGHT}Running ruff format check:${NC}"
+echo -e "${HIGHLIGHT}Running ruff format check on ${APP_DIR} and ${TEST_DIR}:${NC}"
 if ! uv run ruff format --check "${APP_DIR}" "${TEST_DIR}"; then
     echo -e "${TEXT_RED}Ruff needs to be run before committing.${NC}"
     exit 1
@@ -21,7 +21,7 @@ else
 fi
 
 
-echo -e "${HIGHLIGHT}Running ruff lint check:${NC}"
+echo -e "${HIGHLIGHT}Running ruff lint check on ${APP_DIR} and ${TEST_DIR}:${NC}"
 if ! uv run ruff check "${APP_DIR}" "${TEST_DIR}"; then
     echo -e "${TEXT_RED}Ruff lint errors must be resolved before committing.${NC}"
     exit 1
@@ -30,7 +30,7 @@ else
 fi
 
 
-echo -e "${HIGHLIGHT}Running mypy...${NC}"
+echo -e "${HIGHLIGHT}Running mypy on ${APP_DIR} and ${TEST_DIR}...${NC}"
 if ! uv run mypy "${APP_DIR}" "${TEST_DIR}"; then
     echo -e "${TEXT_RED}Mypy errors must be resolved before committing.${NC}"
     exit 1
@@ -39,7 +39,7 @@ else
 fi
 
 
-echo -e "${HIGHLIGHT}Running bandit...${NC}"
+echo -e "${HIGHLIGHT}Running bandit on ${APP_DIR}...${NC}"
 # -c pyproject.toml: required to load [tool.bandit] config (skips, exclude_dirs).
 if ! uv run bandit -c pyproject.toml -r "${APP_DIR}"; then
     echo -e "${TEXT_RED}Bandit security issues must be resolved before committing.${NC}"

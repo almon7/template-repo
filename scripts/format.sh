@@ -7,8 +7,12 @@ set -euo pipefail
 APP_DIR="${1:-/app/app}"
 TEST_DIR="${2:-/app/tests}"
 
-echo "Running ruff format..."
+echo "Running ruff format on ${APP_DIR} and ${TEST_DIR}..."
 uv run ruff format "${APP_DIR}" "${TEST_DIR}"
+echo "ruff format complete."
 
-echo "Running ruff lint --fix..."
+echo "Running ruff lint --fix on ${APP_DIR} and ${TEST_DIR}..."
 uv run ruff check --fix "${APP_DIR}" "${TEST_DIR}"
+echo "ruff lint complete."
+
+echo "All formatting checks done."

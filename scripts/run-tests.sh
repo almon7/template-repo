@@ -17,5 +17,6 @@ set -euo pipefail
 # Use argument if provided, otherwise default to Docker path
 TEST_DIR="${1:-/app/tests}"
 
-echo "Running tests..."
+echo "Running tests in ${TEST_DIR}..."
 uv run pytest "${TEST_DIR}"
+echo "Tests complete."
