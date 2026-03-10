@@ -40,7 +40,8 @@ fi
 
 
 echo -e "${HIGHLIGHT}Running bandit...${NC}"
-if ! uv run bandit -r "${APP_DIR}"; then
+# -c pyproject.toml: required to load [tool.bandit] config (skips, exclude_dirs).
+if ! uv run bandit -c pyproject.toml -r "${APP_DIR}"; then
     echo -e "${TEXT_RED}Bandit security issues must be resolved before committing.${NC}"
     exit 1
 else
