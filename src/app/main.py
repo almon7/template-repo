@@ -1,11 +1,27 @@
-from collections.abc import AsyncGenerator
+from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from loguru import logger
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
 from app.log import configure_logging
 from app.settings import settings
+
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Attach security-hardening response headers to every reply."""
+
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+        response: Response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+        return response
 
 
 @asynccontextmanager
@@ -31,6 +47,10 @@ def create_app() -> FastAPI:
         redoc_url="/redoc" if settings.environment != "production" else None,
         openapi_url="/openapi.json" if settings.environment != "production" else None,
     )
+
+    # Security headers on every response
+    _app.add_middleware(SecurityHeadersMiddleware)
+
     return _app
 
 
