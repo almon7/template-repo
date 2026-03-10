@@ -70,8 +70,6 @@ plugins = ["pydantic.mypy"]
 
 
 [tool.bandit]
-# B101: flags use of `assert`. Asserts are intentional in tests, so we skip this rule.
-skips = ["B101"]
 # Tests are not production code; scanning them produces noise without security value.
 exclude_dirs = ["tests"]
 
