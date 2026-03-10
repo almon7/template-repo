@@ -5,6 +5,7 @@ description = "template-app description"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+   "fastapi[standard]==0.135.1",
    "pydantic==2.12.3",
    "pydantic-settings==2.11.0",
    "loguru==0.7.3",
