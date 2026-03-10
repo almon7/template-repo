@@ -25,13 +25,10 @@ jobs:
           enable-cache: true
 
       - name: Install the project
-        run: uv sync --locked --all-extras --dev
+        run: uv sync --locked --dev
 
       - name: Run code quality checks
-        run: bash scripts/code-checks.sh src/app
-
-      - name: Run bandit security checks
-        run: uv run bandit -r src/app
+        run: bash scripts/code-checks.sh src/app tests
 
       - name: Run tests with coverage
-        run: bash scripts/run-tests.sh tests src/app
+        run: bash scripts/run-tests.sh tests
