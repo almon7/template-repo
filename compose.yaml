@@ -16,7 +16,5 @@ services:
       - ./scripts:/app/scripts
       - ./pyproject.toml:/app/pyproject.toml
       - ./uv.lock:/app/uv.lock
-    environment:
-      - SAMPLE_ENV_VAR=${SAMPLE_ENV_VAR}
     ports:
       - "${APP_PORT:-8000}:8000"
