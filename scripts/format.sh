@@ -1,4 +1,6 @@
 #!/bin/bash
+# -e: abort on error  -u: error on unset variables  -o pipefail: propagate pipe failures
+set -euo pipefail
 # format.sh
 # This script runs code formatting tools on the codebase.
 

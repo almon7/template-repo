@@ -1,4 +1,8 @@
 #!/bin/bash
+# -e: abort immediately if any command exits non-zero
+# -u: treat unset variables as errors instead of silently expanding to empty string
+# -o pipefail: a pipeline fails if any command in it fails (not just the last one)
+set -euo pipefail
 HIGHLIGHT='\033[0;33m'
 TEXT_RED='\033[0;31m'
 TEXT_GREEN='\033[0;32m'

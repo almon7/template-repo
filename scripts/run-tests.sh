@@ -1,4 +1,6 @@
 #!/bin/bash
+# -e: abort on error  -u: error on unset variables  -o pipefail: propagate pipe failures
+set -euo pipefail
 # run-tests.sh
 # This script runs the test suite for the codebase and checks coverage.
 #
