@@ -1,8 +1,5 @@
 [project]
 name = "template-app"
-version = "0.0.1"
-description = "template-app description"
-readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
    "fastapi[standard]==0.135.1",
