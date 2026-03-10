@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Log levels considered 'debug mode' - they expose internal details and must not be used in production.
 _DEBUG_LEVELS = frozenset({"TRACE", "DEBUG"})
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -15,11 +16,12 @@ class Settings(BaseSettings):
 
     app_name: str = "template-app"
 
-    # deployment context: development (default), testing (skip slow startup tasks like DB migrations in CI/pytest), or production.
-    # In production, Swagger UI is disabled and debug log levels are forbidden.
+    # deployment context: development (default), testing (skip slow startup tasks like DB migrations in CI/pytest),
+    # or production. In production, Swagger UI is disabled and debug log levels are forbidden.
     environment: Literal["development", "testing", "production"] = "production"
 
-    # Single source of truth for verbosity: set LOG_LEVEL=DEBUG or TRACE to enable debug mode; both are blocked in production.
+    # Single source of truth for verbosity level: set to DEBUG/TRACE to enable debug mode;
+    # Both DEBUG and TRACE logging levels are blocked in production.
     log_level: Literal["TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"] = "INFO"
 
     @computed_field  # type: ignore[prop-decorator]
