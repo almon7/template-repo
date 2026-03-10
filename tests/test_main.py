@@ -15,8 +15,12 @@ def test_security_headers(client: TestClient) -> None:
     response = client.get("/api/v1/health")
     assert response.headers["x-content-type-options"] == "nosniff"
     assert response.headers["x-frame-options"] == "DENY"
-    assert response.headers["x-xss-protection"] == "1; mode=block"
+    assert response.headers["content-security-policy"] == "default-src 'none'"
     assert response.headers["referrer-policy"] == "strict-origin-when-cross-origin"
+    # X-XSS-Protection is intentionally absent: it is deprecated (removed in
+    # Chrome ≥78, never supported in Firefox) and can introduce vulnerabilities
+    # in old IE/Edge. Content-Security-Policy is the modern replacement.
+    assert "x-xss-protection" not in response.headers
 
 
 def test_docs_available_in_development(client: TestClient) -> None:

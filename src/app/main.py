@@ -21,7 +21,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response: Response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["X-XSS-Protection"] = "1; mode=block"
+        # X-XSS-Protection is deprecated (removed in Chrome ≥78, never in Firefox);
+        # Content-Security-Policy is the modern, effective replacement.
+        response.headers["Content-Security-Policy"] = "default-src 'none'"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
         return response
