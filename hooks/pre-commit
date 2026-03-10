@@ -1,7 +1,8 @@
 #!/bin/bash
 # -e: abort on error  -u: error on unset variables  -o pipefail: propagate pipe failures
 set -euo pipefail
-# This hook runs code checks inside the Docker container
+# This hook runs code checks inside the Docker container if it is running,
+# or falls back to running them locally via uv.
 
 # To set up this hook, run the following:
 #   cp hooks/pre-commit .git/hooks/pre-commit
@@ -10,5 +11,18 @@ set -euo pipefail
 # To override this hook, add the following flag when committing:
 #   git commit --no-verify
 
-
-docker compose exec -T app /usr/bin/bash /app/scripts/code-checks.sh
+# --filter status=running: list only running service names, one per line.
+# 2>/dev/null: suppress Docker error output if the daemon is not running at all.
+# grep -q "^app$": silent check (no output); ^ and $ ensure exact match so a
+#   service named e.g. "app-worker" does not falsely match "app".
+if docker compose ps --services --filter status=running 2>/dev/null | grep -q "^app$"; then
+    # -T disables pseudo-TTY allocation, required for non-interactive use (e.g. git hooks).
+    docker compose exec -T app bash /app/scripts/code-checks.sh
+else
+    echo "Docker container not running — executing checks locally via uv."
+    # git rev-parse --show-toplevel: returns the absolute repo root regardless of cwd,
+    # so the correct paths are passed whether git is run from the root or a subdirectory.
+    bash "$(git rev-parse --show-toplevel)/scripts/code-checks.sh" \
+        "$(git rev-parse --show-toplevel)/src/app" \
+        "$(git rev-parse --show-toplevel)/tests"
+fi
