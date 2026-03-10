@@ -1,6 +1,8 @@
+import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
-from app.settings import settings
+from app.settings import Settings, settings
 
 
 def test_health_check(client: TestClient) -> None:
@@ -33,3 +35,17 @@ def test_openapi_schema(client: TestClient) -> None:
 def test_unknown_route_returns_404(client: TestClient) -> None:
     response = client.get("/does-not-exist")
     assert response.status_code == 404
+
+
+@pytest.mark.parametrize("log_level", ["TRACE", "DEBUG"])
+def test_verbose_log_level_forbidden_in_production(log_level: str) -> None:
+    """Production must reject TRACE and DEBUG log levels."""
+    with pytest.raises(ValidationError, match="is not permitted when ENVIRONMENT=production"):
+        Settings(environment="production", log_level=log_level)
+
+
+@pytest.mark.parametrize(("log_level", "expected_debug"), [("TRACE", True), ("DEBUG", True), ("INFO", False)])
+def test_debug_derived_from_log_level(log_level: str, expected_debug: bool) -> None:
+    """debug is True only when log_level is TRACE or DEBUG."""
+    s = Settings(log_level=log_level)
+    assert s.debug is expected_debug
