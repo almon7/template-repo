@@ -62,6 +62,17 @@ def create_app() -> FastAPI:
     # rejects ["*"] in production, ensuring real domain(s) are always set.
     _app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts)
 
+    # CORS — only enabled when cors_origins is non-empty.
+    # Set CORS_ORIGINS=["https://app.example.com"] to allow a browser frontend.
+    if settings.cors_origins:
+        _app.add_middleware(
+            CORSMiddleware,
+            allow_origins=settings.cors_origins,
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+
     _app.include_router(health.router)
 
     return _app

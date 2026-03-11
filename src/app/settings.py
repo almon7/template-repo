@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     # The production validator below will reject the wildcard to enforce this.
     allowed_hosts: list[str] = ["*"]
 
+    # CORS origins allowed to make cross-origin requests to this API.
+    # Empty list (default) disables CORS middleware entirely — the API is
+    # not reachable from a browser on a different origin.
+    # Set this when a browser-based frontend calls the API:
+    #   CORS_ORIGINS=["https://app.example.com"]
+    cors_origins: list[str] = []
+
     @computed_field  # type: ignore[prop-decorator]
     @property
     def debug(self) -> bool:
