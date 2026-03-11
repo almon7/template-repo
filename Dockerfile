@@ -71,6 +71,14 @@ FROM base AS production
 ARG UID=1000
 ARG GID=1000
 
+# Install curl (needed for HEALTHCHECK) as root before switching back to nonroot.
+# curl is far lighter than spawning a Python process for a single HTTP probe.
+USER root
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+USER nonroot
+
 # Install production dependencies only (no dev group)
 RUN --mount=type=cache,target=/home/nonroot/.cache/uv,uid=${UID},gid=${GID} \
     uv sync --locked --no-install-project --no-dev
@@ -94,7 +102,8 @@ EXPOSE 8000
 
 # Docker will query the health endpoint every 30 s. The 5 s start-period gives
 # uvicorn time to start before the first probe, avoiding false "unhealthy" status.
+# -f: fail on HTTP error status codes (4xx / 5xx)  -s: silent  -S: show errors
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')" || exit 1
+    CMD curl -fsS http://localhost:8000/api/v1/health || exit 1
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
