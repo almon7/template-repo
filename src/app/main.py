@@ -1,8 +1,10 @@
+import uuid
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from importlib.metadata import version
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from loguru import logger
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -12,6 +14,17 @@ from starlette.responses import Response
 from app.log import configure_logging
 from app.routers import health
 from app.settings import settings
+
+# ---------------------------------------------------------------------------
+# Package version
+# ---------------------------------------------------------------------------
+
+_APP_VERSION = version("template-app")
+
+
+# ---------------------------------------------------------------------------
+# Middleware
+# ---------------------------------------------------------------------------
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
@@ -29,6 +42,31 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
+class RequestIDMiddleware(BaseHTTPMiddleware):
+    """Propagate or generate a request-scoped correlation ID.
+
+    * Reads ``X-Request-ID`` from the incoming request (useful when a gateway
+      or client already stamps the request).
+    * Falls back to a freshly generated UUID v4 when the header is absent.
+    * Binds the ID to the loguru context so every log record emitted during
+      that request automatically includes ``request_id``.
+    * Returns the ID in the ``X-Request-ID`` response header so clients and
+      load balancers can correlate their logs with ours.
+    """
+
+    async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
+        request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+        with logger.contextualize(request_id=request_id):
+            response: Response = await call_next(request)
+        response.headers["X-Request-ID"] = request_id
+        return response
+
+
+# ---------------------------------------------------------------------------
+# Lifespan
+# ---------------------------------------------------------------------------
+
+
 @asynccontextmanager
 async def lifespan(application: FastAPI) -> AsyncGenerator[None]:
     """Configure logging and emit startup/shutdown lifecycle events."""
@@ -38,11 +76,16 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None]:
     logger.info("Shutting down {name}", name=settings.app_name)
 
 
+# ---------------------------------------------------------------------------
+# Application factory
+# ---------------------------------------------------------------------------
+
+
 def create_app() -> FastAPI:
     """Application factory — keeps instantiation testable and explicit."""
     _app = FastAPI(
         title=settings.app_name,
-        version=version("template-app"),
+        version=_APP_VERSION,
         lifespan=lifespan,
         # When True, FastAPI includes full Python tracebacks in 500 error
         # responses. Useful locally; blocked in production by the settings
@@ -54,8 +97,12 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json" if settings.environment != "production" else None,
     )
 
-    # Security headers on every response
+    # Middleware is applied in reverse registration order: the last
+    # add_middleware() call becomes the outermost wrapper, so it executes
+    # first on every request.  The intended request order is:
+    #   TrustedHostMiddleware → RequestIDMiddleware → SecurityHeadersMiddleware → route
     _app.add_middleware(SecurityHeadersMiddleware)
+    _app.add_middleware(RequestIDMiddleware)
 
     # Guard against HTTP Host header attacks.
     # allowed_hosts defaults to ["*"] in development; the settings validator
