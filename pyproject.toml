@@ -16,6 +16,7 @@ dev = [
    "mypy==1.18.2",
    "pytest==8.4.2",
    "pytest-cov==7.0.0",
+   "anyio[trio]>=4.0",       # Async test support — FastAPI's native concurrency backend
    "bandit==1.8.6",
    "coverage==7.11.0",
 ]
@@ -84,6 +85,10 @@ addopts = [
     # Fail the test run if coverage drops below this threshold.
     "--cov-fail-under=80",
 ]
+# anyio backend for async tests.  Mark individual async tests with
+# @pytest.mark.anyio (or set pytestmark = pytest.mark.anyio at module level).
+# Both asyncio and trio backends are available via anyio[trio] in dev deps.
+
 
 
 [tool.coverage.run]
