@@ -23,6 +23,22 @@ def test_security_headers(client: TestClient) -> None:
     assert "x-xss-protection" not in response.headers
 
 
+def test_request_id_generated_when_absent(client: TestClient) -> None:
+    """A request without X-Request-ID must receive a freshly generated UUID."""
+    response = client.get("/api/v1/health")
+    assert "x-request-id" in response.headers
+    # Basic UUID v4 shape check
+    request_id = response.headers["x-request-id"]
+    assert len(request_id) == 36  # xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+
+def test_request_id_propagated_when_present(client: TestClient) -> None:
+    """A supplied X-Request-ID must be echoed back unchanged."""
+    custom_id = "my-trace-id-123"
+    response = client.get("/api/v1/health", headers={"X-Request-ID": custom_id})
+    assert response.headers["x-request-id"] == custom_id
+
+
 def test_docs_available_in_development(client: TestClient) -> None:
     """Swagger UI should be reachable in non-production environments."""
     response = client.get("/docs")
