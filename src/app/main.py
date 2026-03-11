@@ -1,7 +1,6 @@
 import uuid
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import asynccontextmanager
-from importlib.metadata import version
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,13 +13,6 @@ from starlette.responses import Response
 from app.log import configure_logging
 from app.routers import health
 from app.settings import settings
-
-# ---------------------------------------------------------------------------
-# Package version
-# ---------------------------------------------------------------------------
-
-_APP_VERSION = version("template-app")
-
 
 # ---------------------------------------------------------------------------
 # Middleware
@@ -85,7 +77,7 @@ def create_app() -> FastAPI:
     """Application factory — keeps instantiation testable and explicit."""
     _app = FastAPI(
         title=settings.app_name,
-        version=_APP_VERSION,
+        version=settings.app_version,
         lifespan=lifespan,
         # When True, FastAPI includes full Python tracebacks in 500 error
         # responses. Useful locally; blocked in production by the settings

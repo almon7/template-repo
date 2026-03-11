@@ -1,3 +1,4 @@
+from importlib.metadata import version
 from typing import Literal
 
 from pydantic import computed_field, model_validator
@@ -15,6 +16,12 @@ class Settings(BaseSettings):
     )
 
     app_name: str = "template-app"
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def app_version(self) -> str:
+        """Package version read from importlib.metadata at startup."""
+        return version(self.app_name)
 
     # deployment context: development (default), testing (skip slow startup tasks like DB migrations in CI/pytest),
     # or production. In production, Swagger UI is disabled and debug log levels are forbidden.
