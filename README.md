@@ -64,6 +64,9 @@ To set them up with git, create a symlink so the hook stays in sync with any fut
 ln -s ../../hooks/pre-commit .git/hooks/pre-commit
 ```
 
+No `chmod` is needed — `hooks/pre-commit` is committed with executable permissions (`100755`), so git restores it as
+executable for everyone who clones the repo.
+
 To skip the pre-commit checks, use the `--no-verify` flag when committing:
 
 ```bash
