@@ -58,11 +58,10 @@ This ensures your new project starts with a clean commit history, independent fr
 ### 3. [Optional] Enable Pre-commit hooks
 
 Some pre-commits hooks that run code checks with 'ruff' and 'mypy' are provided.
-To set them up with git, copy the pre-commit file containing the hooks to the .git folder:
+To set them up with git, create a symlink so the hook stays in sync with any future changes:
 
 ```bash
-cp hooks/pre-commit .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
+ln -s ../../hooks/pre-commit .git/hooks/pre-commit
 ```
 
 To skip the pre-commit checks, use the `--no-verify` flag when committing:
